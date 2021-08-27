@@ -41,12 +41,22 @@ public class StatisticServiceImpl implements StatisticService {
 
     @Override
     public StatisticDTO getYearMonthLoginNum(String yearMonth) {
+        StatisticDTO statisticDTO = null;
+        try{
+            System.out.println("try?");
+            verify(4, yearMonth);
+        } catch (Exception e) {
+            statisticDTO = new StatisticDTO();
+            statisticDTO.getErrors().add(new ErrorDTO(e.getMessage()));
+            statisticDTO.setValue("" + -999L);
+            statisticDTO.setInput(yearMonth);
+            return statisticDTO;
+        }
 
-        StatisticDTO statisticDTO = new StatisticDTO();
 
         String year = yearMonth.substring(0,2);
         String month = yearMonth.substring(2,4);
-        statisticDTO.setInput(yearMonth);
+
 
         try{
             statisticDTO = mapper.selectYearMonthLogin(year, month);
@@ -56,13 +66,22 @@ public class StatisticServiceImpl implements StatisticService {
             statisticDTO.setHasErrors(true);
             statisticDTO.getErrors().add(new ErrorDTO(e.getMessage()));
         }
-
+        statisticDTO.setInput(yearMonth);
         return statisticDTO;
     }
 
     @Override
     public StatisticDTO getYearMonthDayLoginNum(String yearMonthDay) {
         StatisticDTO statisticDTO = null;
+        try{
+            verify(6, yearMonthDay);
+        } catch (Exception e) {
+            statisticDTO = new StatisticDTO();
+            statisticDTO.getErrors().add(new ErrorDTO(e.getMessage()));
+            statisticDTO.setValue("" + -999L);
+            statisticDTO.setInput(yearMonthDay);
+            return statisticDTO;
+        }
 
         String year = yearMonthDay.substring(0, 2);
         String month = yearMonthDay.substring(2,4);
@@ -111,6 +130,17 @@ public class StatisticServiceImpl implements StatisticService {
     public StatisticDTO getYearMonthDepartmentLoginNum(String yearMonth, String department) {
         StatisticDTO statisticDTO = null;
         try{
+            verify(4, yearMonth);
+        } catch (Exception e) {
+            statisticDTO = new StatisticDTO();
+            statisticDTO.getErrors().add(new ErrorDTO(e.getMessage()));
+            statisticDTO.setValue("" + -999L);
+            statisticDTO.setInput("yearMonth : " + yearMonth + ", department : " + department );
+            return statisticDTO;
+        }
+
+
+        try{
             statisticDTO = mapper.selectYearMonthDepartment(yearMonth, department);
             statisticDTO.setHasErrors(false);
         } catch (Exception e){
@@ -120,8 +150,14 @@ public class StatisticServiceImpl implements StatisticService {
         }
 
 
-        statisticDTO.setInput("yearMonth : " + yearMonth + ", department : " + department );
 
         return statisticDTO;
     }
+
+
+    private void verify(int length, String input) throws Exception {
+        if((input.length() != length) || !input.matches("^[0-9]*$"))
+            throw new Exception("Invalid input.");
+    }
 }
+
