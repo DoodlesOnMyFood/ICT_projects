@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.StatisticMapper">
+    <select id="selectYearLogin" resultType="com.example.demo.dto.StatisticDTO">
+        select convert(count(*), char) as value
+        from requestInfo ri
+        where left(ri.createDate, 2) = #{year}
+    </select>
+    <select id="selectYearMonthLogin" resultType="com.example.demo.dto.StatisticDTO">
+        select convert(count(*), char) as value
+        from requestInfo ri
+        where left(ri.createDate, 2) = #{year} and right(left(ri.createDate, 4), 2) = #{month}
+    </select>
+    <select id="selectYearMonthDayLogin" resultType="com.example.demo.dto.StatisticDTO">
+        select convert(count(*), char) as value
+        from requestInfo ri
+        where left(ri.createDate, 6) = concat(#{year}, #{month}, #{day})
+    </select>
+    
+
+    
+    <select id="getDailyCounts" resultType="java.util.Map">
+        select convert(count(*), char) as value, to_char(now(), 'YYYY-MM-DD') as today,
+               CONCAT('20',left(min(createDate), 2), '-', right(left(min(createDate), 4),2), '-', right(left(min(createDate), 6),2)) as first
+        from requestInfo;
+    </select>
+    <select id="selectCountNotDaysOff" resultType="com.example.demo.dto.StatisticDTO">
+        select convert(count(*), char) as value from requestInfo ri
+        left join daysOff do on  CONCAT('20',left(ri.createDate, 2), '-', right(left(ri.createDate, 4),2), '-', right(left(ri.createDate, 6),2)) = do.dates
+        where do.dates is Null
+    </select>
+    <select id="selectYearMonthDepartment" resultType="com.example.demo.dto.StatisticDTO">
+        select convert(count(*), char) as value from requestInfo ri
+        join user us on us.userID = ri.userID
+        where left(ri.createDate, 4) = #{yearMonth} and us.HR_ORGAN = #{department}
+    </select>
+</mapper>
